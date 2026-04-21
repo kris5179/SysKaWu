@@ -1,0 +1,20 @@
+taski.md
+
+# Pliki budowania
+/build/
+/cmake-build-debug/
+/cmake-build-release/
+/compile_commands.json
+
+# Pliki IDE
+.idea/
+cmake-build-*/
+
+# Pliki edytora
+*.swp
+*.swo
+.netrwhist
+undo/
+
+# binarki
+SysKaWu
