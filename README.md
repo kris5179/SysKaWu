@@ -1,2 +1,2 @@
 # SysKaWu
-system zarządania kliniką weterynaryjną 
+System zarządania kliniką weterynaryjną 
