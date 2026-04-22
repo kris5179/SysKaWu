@@ -1,3 +1,3 @@
 #pragma once
-
-void test();
+#include <string>
+void test(std::string haslo);
