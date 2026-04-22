@@ -3,17 +3,16 @@
 #include <sodium.h>
 #include <sodium/core.h>
 #include <sodium/crypto_generichash.h>
+#include <sodium/crypto_pwhash.h>
 #include <sodium/crypto_secretbox.h>
 #include <sodium/randombytes.h>
 #include <string>
 
 using namespace std;
 
-#define MESSAGE ((const unsigned char *) "test")
-#define MESSAGE_LEN 4
-#define CIPHERTEXT_LEN (crypto_secretbox_MACBYTES + MESSAGE_LEN)
+constexpr size_t KEY_LEN=crypto_box_SEEDBYTES;
 
-void test(string haslo)
+void test(const string& haslo)
 {
     cout << "Hello, szyfrowanie" << endl;        
     if (sodium_init() < 0){
@@ -21,17 +20,22 @@ void test(string haslo)
         return;
     }
 
-    unsigned char hash[crypto_generichash_BYTES];
-    unsigned char key[crypto_generichash_KEYBYTES];
+    unsigned char salt[crypto_pwhash_SALTBYTES];
+    unsigned char key[KEY_LEN];
+    char hash[crypto_pwhash_STRBYTES];
     
-    randombytes_buf(key, sizeof key);
+    randombytes_buf(salt, sizeof salt);
 
-    crypto_generichash(hash, sizeof hash, MESSAGE, MESSAGE_LEN, key, sizeof key);
-
-    cout << "Oto wynik hashowania stringa " << haslo << ": " << endl;
-    for(size_t i = 0; i < sizeof hash; i++){
-        printf("%02x", hash[i]);
+    if  (crypto_pwhash_str(
+            hash,
+            haslo.c_str(),
+            haslo.size(),
+            crypto_pwhash_OPSLIMIT_INTERACTIVE,
+            crypto_pwhash_MEMLIMIT_INTERACTIVE
+        ) !=0){
+        cout << "Za mało pamięci" << endl;
+        return;
     }
 
-    cout << endl;
+    cout << "Oto hash hasła:\n" << hash << endl;
 }   
