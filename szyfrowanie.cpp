@@ -12,12 +12,12 @@ using namespace std;
 
 constexpr size_t KEY_LEN=crypto_box_SEEDBYTES;
 
-void test(const string& haslo)
+string test(const string& haslo)
 {
     cout << "Hello, szyfrowanie" << endl;        
     if (sodium_init() < 0){
         cout << "Biblioteka sodium nie mogła zostać załadowana" << endl;
-        return;
+        return {};
     }
 
     unsigned char salt[crypto_pwhash_SALTBYTES];
@@ -34,8 +34,9 @@ void test(const string& haslo)
             crypto_pwhash_MEMLIMIT_INTERACTIVE
         ) !=0){
         cout << "Za mało pamięci" << endl;
-        return;
+        return{};
     }
 
     cout << "Oto hash hasła:\n" << hash << endl;
+    return string(hash);
 }   
