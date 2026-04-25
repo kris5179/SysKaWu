@@ -9,7 +9,9 @@ add_executable(SysKaWu main.cpp
 	szyfrowanie.cpp
 	szyfrowanie.h
     db_test.cpp
-    db_test.h)
+    db_test.h
+    connection.cpp
+    connection.h)
     
 target_link_libraries(SysKaWu sodium)
 target_link_libraries(SysKaWu SQLite::SQLite3)

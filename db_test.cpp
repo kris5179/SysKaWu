@@ -3,7 +3,10 @@
     // wiadomo można robić query typu create table, select, itd.
     // .schema <nazwa_tabeli> - pokazuje, jakie pola mamy w tabeli
     // lub .headers on i wtedy pokazuja sie dane w tabeli razem z naglowkami
-    //
+    // czyli żeby jakoś ładnie wyświetlić tabelę przez terminal to polecam
+    // .headers on
+    // .mode table 
+    // i wtedy robicie select czy co tam potrzeba
 #include "db_test.h"
 #include "sqlite3.h"
 #include <iostream>
