@@ -12,7 +12,7 @@ using namespace std;
 
 constexpr size_t KEY_LEN=crypto_box_SEEDBYTES;
 
-string test(const string& haslo)
+string passHashing(const string& haslo)
 {
     cout << "Hello, szyfrowanie" << endl;        
     if (sodium_init() < 0){

@@ -12,9 +12,10 @@ int main()
     int rc=0;
     int testId=7;
     string testPassword="qwerty";
-    string testHash=test(testPassword);
+    string testHash=passHashing(testPassword);
     
-    Connection baza(rc, db, "example_users");
+    Connection baza("../example_users.db");
+    baza.Insert(69, 123, "administrator", passHashing("qwerty"));
     baza.SelectById(6);
     baza.SelectByLogin("user");
     baza.SelectByPrivilege(7);

@@ -2,4 +2,4 @@
 #include <string>
 using namespace std;
 
-string test(const string& haslo);
+string passHashing(const string& haslo);
