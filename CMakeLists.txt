@@ -1,17 +1,8 @@
-cmake_minimum_required(VERSION 3.31)
-project(SysKaWu)
+cmake_minimum_required(VERSION 4.2)
+project(Serwer)
 
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-find_package(SQLite3 REQUIRED)
 
-add_executable(SysKaWu main.cpp
-	szyfrowanie.cpp
-	szyfrowanie.h
-    db_test.cpp
-    db_test.h
-    connection.cpp
-    connection.h)
-    
-target_link_libraries(SysKaWu sodium)
-target_link_libraries(SysKaWu SQLite::SQLite3)
+add_executable(Serwer main.cpp
+        serverHeader.h
+        serverBodies.cpp)
