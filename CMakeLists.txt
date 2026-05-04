@@ -6,12 +6,13 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 find_package(SQLite3 REQUIRED)
 
 add_executable(SysKaWu main.cpp
-	szyfrowanie.cpp
-	szyfrowanie.h
-    db_test.cpp
-    db_test.h
-    connection.cpp
-    connection.h)
+	backend/szyfrowanie.cpp
+	backend/szyfrowanie.h
+    backend/connection.cpp
+    backend/connection.h
+    backend/serverHeader.h
+    backend/serverBodies.cpp)
+
     
 target_link_libraries(SysKaWu sodium)
 target_link_libraries(SysKaWu SQLite::SQLite3)

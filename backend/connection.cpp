@@ -20,6 +20,8 @@ void Connection::Insert(int id, int privilege, const string& username, const str
     const char* query = "INSERT INTO users (id, privilege, login, password) VALUES (?, ?, ?, ?)";
     sqlite3_stmt* stmt;
 
+    
+
     // stmt, prepare, bind są po to, żeby chronić nas przed SQL injection
     // moim zdaniem jest to bardziej czytelne niż konkatenacja stringów
     if (sqlite3_prepare_v2(dbHandle_, query, -1, &stmt, nullptr) == SQLITE_OK){
