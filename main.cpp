@@ -1,5 +1,7 @@
 #include <iostream>
-#include "serverHeader.h"
+#include "backend/serverHeader.h"
+#include "backend/connection.h"
+#include "backend/szyfrowanie.h"
 
 using namespace std;
 
