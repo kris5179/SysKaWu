@@ -72,22 +72,6 @@ void Connection::SelectByPrivilege(int privilege){
     }
 }
 
-void Connection::SelectByLogin(string username){
-    const char* query = "SELECT * FROM users WHERE login='?';";
-    sqlite3_stmt* stmt;
-
-    if (sqlite3_prepare_v2(dbHandle_, query, -1, &stmt, nullptr) == SQLITE_OK){
-        sqlite3_bind_text(stmt, 1, username.c_str(), username.length(), SQLITE_STATIC);
-        if (sqlite3_step(stmt) != SQLITE_DONE) {
-            queryError();
-        } else {
-            cout << "Zapytanie wykonano pomyślnie" << endl;
-        }
-    } else {
-        prepStmtError();
-    }
-}
-
 void Connection::Delete(int id){
     const char* query = "DELETE FROM users WHERE id=?;";
     sqlite3_stmt* stmt;
@@ -118,6 +102,41 @@ void Connection::Delete(string username){
     } else {
         prepStmtError();
     }
+}
+
+queryResponse Connection::Login(string login, string password) {
+    queryResponse response;
+    const char* query = "SELECT * FROM users WHERE login=?;";
+    sqlite3_stmt* stmt;
+    string hash = passHashing(password);
+    if (sqlite3_prepare_v2(dbHandle_, query, -1, &stmt, nullptr) == SQLITE_OK){
+        sqlite3_bind_text(stmt, 1, login.c_str(), login.length(), SQLITE_STATIC);
+        if (sqlite3_step(stmt) == SQLITE_ROW) {
+            cout << "Zapytanie wykonano pomyślnie" << endl;
+            if ( ! (hash == (const char*)(sqlite3_column_text(stmt, 3))) ) {
+                cout << "Hasło się nie zgadza" << endl;
+                response.id = -1;
+                response.privilege = -1;
+                response.login = "";
+                response.found = false;
+                return response;
+                    }
+            else{
+                response.found = true;
+                // 0 - 1 kolumna, 1 - 2 kolumna, itd.
+                response.id = sqlite3_column_int(stmt, 0);
+                response.privilege = sqlite3_column_int(stmt, 1);
+                response.login = (const char*)sqlite3_column_text(stmt, 2);
+            }
+        } else {
+            response.found = false;
+            cout << "Zapytanie wykonano pomyślnie, jednak nie znaleziono wiersza" << endl;
+        }
+    } else {
+        prepStmtError();
+    }
+
+    return response;
 }
 
 Connection::~Connection(){

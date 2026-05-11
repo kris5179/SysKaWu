@@ -1,5 +1,6 @@
 #include <string>
 #include "sqlite3.h"
+#include "queryResponse.h"
 using namespace std;
 
 
@@ -14,9 +15,9 @@ public:
     void Insert(int id, int privilege, const string& username, const string& password);
     void SelectById(int id);
     void SelectByPrivilege(int privilege);
-    void SelectByLogin(string username);
     void Delete(int id);
     void Delete(string username);
+    queryResponse Login(string login, string password);
     void queryError();
     void prepStmtError();
 };
