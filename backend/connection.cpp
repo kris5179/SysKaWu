@@ -1,5 +1,7 @@
 #include "connection.h"
 #include <iostream>
+#include <sodium.h>
+#include <sodium/crypto_pwhash.h>
 #include <string>
 #include "sqlite3.h"
 #include "passwords.h"
@@ -20,8 +22,6 @@ void Connection::Insert(int id, int privilege, const string& username, const str
     string hash = passHashing(password);
     const char* query = "INSERT INTO Uzytkownicy (ID, Privilege, Login, Password) VALUES (?, ?, ?, ?)";
     sqlite3_stmt* stmt;
-
-    
 
     // stmt, prepare, bind są po to, żeby chronić nas przed SQL injection
     // moim zdaniem jest to bardziej czytelne niż konkatenacja stringów
@@ -109,20 +109,27 @@ queryResponse Connection::Login(string login, string password) {
     queryResponse response;
     const char* query = "SELECT * FROM Uzytkownicy WHERE Login=?;";
     sqlite3_stmt* stmt;
-    string hash = passHashing(password);
     if (sqlite3_prepare_v2(dbHandle_, query, -1, &stmt, nullptr) == SQLITE_OK){
         sqlite3_bind_text(stmt, 1, login.c_str(), login.length(), SQLITE_STATIC);
         if (sqlite3_step(stmt) == SQLITE_ROW) {
             cout << "Zapytanie wykonano pomyślnie" << endl;
-            if ( ! (hash == (const char*)(sqlite3_column_text(stmt, 3))) ) {
+
+            // sprawdzenie czy haslo sie zgadza za pomoca libsodium
+            const char* storedHash = (const char*)sqlite3_column_text(stmt, 3);
+            if (crypto_pwhash_str_verify(
+                storedHash,
+                password.c_str(),
+                password.size() != 0)) 
+            {
                 cout << "Hasło się nie zgadza" << endl;
                 response.id = -1;
                 response.privilege = -1;
                 response.login = "";
                 response.found = false;
                 return response;
-                    }
-            else{
+            }
+
+            else {
                 response.found = true;
                 // 0 - 1 kolumna, 1 - 2 kolumna, itd.
                 response.id = sqlite3_column_int(stmt, 0);

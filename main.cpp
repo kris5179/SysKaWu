@@ -21,11 +21,9 @@ int main(int argc, char* argv[]){
         cout << "Biblioteka sodium nie mogła zostać załadowana" << endl;
     }
     
-    Connection con = Connection();
     string haslo = "haslo";
     string login = "login";
     string hash = passHashing(haslo);
-    con.Insert(1, 2, login, hash);
     
     Manager manager;
     QGuiApplication app(argc, argv);

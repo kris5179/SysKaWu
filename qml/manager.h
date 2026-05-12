@@ -10,12 +10,13 @@ class Manager : public QObject {
     Connection con;
     queryResponse response;
     QVariantMap user;
+    bool loginSuccess = false;
 public:
     Manager();
     virtual ~Manager();
     // mapa to słownik klucz - wartość
     QVariantMap getUser(); 
-    Q_INVOKABLE void logIntoApp(string login, string password);
+    Q_INVOKABLE void logIntoApp(QString login, QString password);
 signals:
     void loginSignal();
 };

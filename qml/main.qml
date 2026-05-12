@@ -8,16 +8,34 @@ ApplicationWindow{
     height: 100
     title: "SysKaWu"
 
-    Text {
-        id: tekst1
+    Column {
         anchors.centerIn: parent
-        text: "Hello, World"
+
+        TextField {
+            id: poleLogin
+            placeholderText: "Wpisz login"
+        }
+
+        TextField {
+            id: poleHaslo
+            placeholderText: "Wpisz haslo"
+            echoMode: TextInput.Password
+        }
+
+        Button {
+            text: "Klik"
+            onClicked: klinika.logIntoApp(poleLogin.text, poleHaslo.text)
+        }
     }
 
-    Button {
-        text: "Klik"
-        onClicked:{
-            klinika.logIntoApp()
+    Connections {
+        target: klinika
+        function onLoginSignal(){
+            if (klinika.loginSuccess){
+                komunikat.text = "Witaj, " + klinka.response.login
+            } else {
+                text: "Wprowadzone hasło lub login są nieprawidłowe"
+            }
         }
     }
 }

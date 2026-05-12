@@ -1,4 +1,5 @@
 #include "manager.h"
+using namespace std;
 
 Manager::Manager() {};
 
@@ -7,18 +8,22 @@ QVariantMap Manager::getUser() {
     return user; 
 } 
 
-Q_INVOKABLE void Manager::logIntoApp(string login, string password){
-    response = con.Login(login, password);
+Q_INVOKABLE void Manager::logIntoApp(QString login, QString password){
+    response = con.Login(login.toStdString(), password.toStdString());
     
-    // response.id = -1, kiedy nie znaleziono usera, tak napisalem funkcje w connection.cpp
     // response.found == false jest wtedy, kiedy nie znaleziono użytkownika
-    // a response.id < 0 wtedy, kiedy hasło jest złe
-    if (response.found == false || response.id < 0){
+    if (response.found == false) {
+        loginSuccess = false;
+        emit loginSignal();
+    }
 
-        // nwm czemu akurat emit, no ale tak sie to robi w Qt
+    // response.id = -1, kiedy hasło jest złe
+    else if (response.id < 0){
+        loginSuccess = false;
         emit loginSignal();
     }
     else {
+        loginSuccess = true;
         user["id"] = response.id;
 
         // przejscie ze stringa na QString
