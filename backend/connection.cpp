@@ -1,8 +1,10 @@
 #include "connection.h"
 #include <iostream>
+#include <sodium.h>
+#include <sodium/crypto_pwhash.h>
 #include <string>
 #include "sqlite3.h"
-#include "szyfrowanie.h"
+#include "passwords.h"
 using namespace std;
 
 Connection::Connection(const string& filename)
@@ -15,20 +17,18 @@ Connection::Connection(const string& filename)
     }
 }
 
-void Connection::Insert(int id, int privilege, const string& username, const string& password){
-    string hash = passHashing(password);
-    const char* query = "INSERT INTO users (id, privilege, login, password) VALUES (?, ?, ?, ?)";
-    sqlite3_stmt* stmt;
 
-    
+void Connection::Insert(int privilege, const string& username, const string& password){
+    string hash = passHashing(password);
+    const char* query = "INSERT INTO Uzytkownicy (Privilege, Login, Password) VALUES (?, ?, ?)";
+    sqlite3_stmt* stmt;
 
     // stmt, prepare, bind są po to, żeby chronić nas przed SQL injection
     // moim zdaniem jest to bardziej czytelne niż konkatenacja stringów
     if (sqlite3_prepare_v2(dbHandle_, query, -1, &stmt, nullptr) == SQLITE_OK){
-        sqlite3_bind_int(stmt, 1, id);
-        sqlite3_bind_int(stmt, 2, privilege);
-        sqlite3_bind_text(stmt, 3, username.c_str(), username.length(), SQLITE_STATIC);
-        sqlite3_bind_text(stmt, 4, hash.c_str(), hash.length(), SQLITE_STATIC);
+        sqlite3_bind_int(stmt, 1, privilege);
+        sqlite3_bind_text(stmt, 2, username.c_str(), username.length(), SQLITE_STATIC);
+        sqlite3_bind_text(stmt, 3, hash.c_str(), hash.length(), SQLITE_STATIC);
 
         if (sqlite3_step(stmt) != SQLITE_DONE) {
             queryError();
@@ -41,7 +41,7 @@ void Connection::Insert(int id, int privilege, const string& username, const str
 }
 
 void Connection::SelectById(int id){ 
-    const char* query = "SELECT * FROM users WHERE id=?;";
+    const char* query = "SELECT * FROM Uzytkownicy WHERE ID=?;";
     sqlite3_stmt* stmt;
 
     if (sqlite3_prepare_v2(dbHandle_, query, -1, &stmt, nullptr) == SQLITE_OK){
@@ -57,7 +57,7 @@ void Connection::SelectById(int id){
 }
 
 void Connection::SelectByPrivilege(int privilege){
-    const char* query = "SELECT * FROM users WHERE privilege=?;";
+    const char* query = "SELECT * FROM Uzytkownicy WHERE Privilege=?;";
     sqlite3_stmt* stmt;
 
     if (sqlite3_prepare_v2(dbHandle_, query, -1, &stmt, nullptr) == SQLITE_OK){
@@ -72,24 +72,8 @@ void Connection::SelectByPrivilege(int privilege){
     }
 }
 
-void Connection::SelectByLogin(string username){
-    const char* query = "SELECT * FROM users WHERE login='?';";
-    sqlite3_stmt* stmt;
-
-    if (sqlite3_prepare_v2(dbHandle_, query, -1, &stmt, nullptr) == SQLITE_OK){
-        sqlite3_bind_text(stmt, 1, username.c_str(), username.length(), SQLITE_STATIC);
-        if (sqlite3_step(stmt) != SQLITE_DONE) {
-            queryError();
-        } else {
-            cout << "Zapytanie wykonano pomyślnie" << endl;
-        }
-    } else {
-        prepStmtError();
-    }
-}
-
 void Connection::Delete(int id){
-    const char* query = "DELETE FROM users WHERE id=?;";
+    const char* query = "DELETE FROM Uzytkownicy WHERE ID=?;";
     sqlite3_stmt* stmt;
 
     if (sqlite3_prepare_v2(dbHandle_, query, -1, &stmt, nullptr) == SQLITE_OK){
@@ -105,7 +89,7 @@ void Connection::Delete(int id){
 }
 
 void Connection::Delete(string username){
-    const char* query = "DELETE FROM users WHERE login='?';";
+    const char* query = "DELETE FROM Uzytkownicy WHERE Login=?;";
     sqlite3_stmt* stmt;
 
     if (sqlite3_prepare_v2(dbHandle_, query, -1, &stmt, nullptr) == SQLITE_OK){
@@ -118,6 +102,48 @@ void Connection::Delete(string username){
     } else {
         prepStmtError();
     }
+}
+
+queryResponse Connection::Login(string login, string password) {
+    queryResponse response;
+    const char* query = "SELECT * FROM Uzytkownicy WHERE Login=?;";
+    sqlite3_stmt* stmt;
+    if (sqlite3_prepare_v2(dbHandle_, query, -1, &stmt, nullptr) == SQLITE_OK){
+        sqlite3_bind_text(stmt, 1, login.c_str(), login.length(), SQLITE_STATIC);
+        if (sqlite3_step(stmt) == SQLITE_ROW) {
+            cout << "Zapytanie wykonano pomyślnie" << endl;
+
+            // sprawdzenie czy haslo sie zgadza za pomoca libsodium
+            const char* storedHash = (const char*)sqlite3_column_text(stmt, 3);
+            if (crypto_pwhash_str_verify(
+                storedHash,
+                password.c_str(),
+                password.size()) != 0) 
+            {
+                cout << "Hasło się nie zgadza" << endl;
+                response.id = -1;
+                response.privilege = -1;
+                response.login = "";
+                response.found = false;
+                return response;
+            }
+
+            else {
+                response.found = true;
+                // 0 - 1 kolumna, 1 - 2 kolumna, itd.
+                response.id = sqlite3_column_int(stmt, 0);
+                response.privilege = sqlite3_column_int(stmt, 1);
+                response.login = (const char*)sqlite3_column_text(stmt, 2);
+            }
+        } else {
+            response.found = false;
+            cout << "Zapytanie wykonano pomyślnie, jednak nie znaleziono wiersza" << endl;
+        }
+    } else {
+        prepStmtError();
+    }
+
+    return response;
 }
 
 Connection::~Connection(){

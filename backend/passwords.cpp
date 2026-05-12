@@ -1,5 +1,5 @@
 #include <iostream>
-#include "szyfrowanie.h"
+#include "passwords.h"
 #include <sodium.h>
 #include <sodium/core.h>
 #include <sodium/crypto_generichash.h>
@@ -14,12 +14,6 @@ constexpr size_t KEY_LEN=crypto_box_SEEDBYTES;
 
 string passHashing(const string& haslo)
 {
-    cout << "Hello, szyfrowanie" << endl;        
-    if (sodium_init() < 0){
-        cout << "Biblioteka sodium nie mogła zostać załadowana" << endl;
-        return {};
-    }
-
     unsigned char salt[crypto_pwhash_SALTBYTES];
     unsigned char key[KEY_LEN];
     char hash[crypto_pwhash_STRBYTES];
