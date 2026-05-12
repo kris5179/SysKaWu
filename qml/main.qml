@@ -26,15 +26,20 @@ ApplicationWindow{
             text: "Klik"
             onClicked: klinika.logIntoApp(poleLogin.text, poleHaslo.text)
         }
+
+        Text {
+            id: komunikat
+            text: ""
+        }
     }
 
     Connections {
         target: klinika
         function onLoginSignal(){
             if (klinika.loginSuccess){
-                komunikat.text = "Witaj, " + klinka.response.login
+                komunikat.text = "Witaj, " + klinika.user["login"]
             } else {
-                text: "Wprowadzone hasło lub login są nieprawidłowe"
+                komunikat.text = "Wprowadzone hasło lub login są nieprawidłowe"
             }
         }
     }

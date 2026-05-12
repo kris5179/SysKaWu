@@ -11,7 +11,7 @@ private:
 public:
     Connection(const string& filename = "Baza_glowna.db");
     virtual ~Connection();
-    void Insert(int id, int privilege, const string& username, const string& password);
+    void Insert(int privilege, const string& username, const string& password);
     void SelectById(int id);
     void SelectByPrivilege(int privilege);
     void Delete(int id);

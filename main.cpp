@@ -24,12 +24,11 @@ int main(int argc, char* argv[]){
     string haslo = "haslo";
     string login = "login";
     string hash = passHashing(haslo);
-    
     Manager manager;
     QGuiApplication app(argc, argv);
     QQmlApplicationEngine engine;
-    engine.load("qrc:/main.qml");
     engine.rootContext()->setContextProperty("klinika", &manager);
+    engine.load("qrc:/main.qml");
     return app.exec();
 
     //Server Server(8080);

@@ -18,18 +18,17 @@ Connection::Connection(const string& filename)
 }
 
 
-void Connection::Insert(int id, int privilege, const string& username, const string& password){
+void Connection::Insert(int privilege, const string& username, const string& password){
     string hash = passHashing(password);
-    const char* query = "INSERT INTO Uzytkownicy (ID, Privilege, Login, Password) VALUES (?, ?, ?, ?)";
+    const char* query = "INSERT INTO Uzytkownicy (Privilege, Login, Password) VALUES (?, ?, ?)";
     sqlite3_stmt* stmt;
 
     // stmt, prepare, bind są po to, żeby chronić nas przed SQL injection
     // moim zdaniem jest to bardziej czytelne niż konkatenacja stringów
     if (sqlite3_prepare_v2(dbHandle_, query, -1, &stmt, nullptr) == SQLITE_OK){
-        sqlite3_bind_int(stmt, 1, id);
-        sqlite3_bind_int(stmt, 2, privilege);
-        sqlite3_bind_text(stmt, 3, username.c_str(), username.length(), SQLITE_STATIC);
-        sqlite3_bind_text(stmt, 4, hash.c_str(), hash.length(), SQLITE_STATIC);
+        sqlite3_bind_int(stmt, 1, privilege);
+        sqlite3_bind_text(stmt, 2, username.c_str(), username.length(), SQLITE_STATIC);
+        sqlite3_bind_text(stmt, 3, hash.c_str(), hash.length(), SQLITE_STATIC);
 
         if (sqlite3_step(stmt) != SQLITE_DONE) {
             queryError();
@@ -119,7 +118,7 @@ queryResponse Connection::Login(string login, string password) {
             if (crypto_pwhash_str_verify(
                 storedHash,
                 password.c_str(),
-                password.size() != 0)) 
+                password.size()) != 0) 
             {
                 cout << "Hasło się nie zgadza" << endl;
                 response.id = -1;
