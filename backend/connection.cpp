@@ -2,7 +2,7 @@
 #include <iostream>
 #include <string>
 #include "sqlite3.h"
-#include "szyfrowanie.h"
+#include "passwords.h"
 using namespace std;
 
 Connection::Connection(const string& filename)
@@ -15,9 +15,10 @@ Connection::Connection(const string& filename)
     }
 }
 
+
 void Connection::Insert(int id, int privilege, const string& username, const string& password){
     string hash = passHashing(password);
-    const char* query = "INSERT INTO users (id, privilege, login, password) VALUES (?, ?, ?, ?)";
+    const char* query = "INSERT INTO Uzytkownicy (ID, Privilege, Login, Password) VALUES (?, ?, ?, ?)";
     sqlite3_stmt* stmt;
 
     
@@ -41,7 +42,7 @@ void Connection::Insert(int id, int privilege, const string& username, const str
 }
 
 void Connection::SelectById(int id){ 
-    const char* query = "SELECT * FROM users WHERE id=?;";
+    const char* query = "SELECT * FROM Uzytkownicy WHERE ID=?;";
     sqlite3_stmt* stmt;
 
     if (sqlite3_prepare_v2(dbHandle_, query, -1, &stmt, nullptr) == SQLITE_OK){
@@ -57,7 +58,7 @@ void Connection::SelectById(int id){
 }
 
 void Connection::SelectByPrivilege(int privilege){
-    const char* query = "SELECT * FROM users WHERE privilege=?;";
+    const char* query = "SELECT * FROM Uzytkownicy WHERE Privilege=?;";
     sqlite3_stmt* stmt;
 
     if (sqlite3_prepare_v2(dbHandle_, query, -1, &stmt, nullptr) == SQLITE_OK){
@@ -73,7 +74,7 @@ void Connection::SelectByPrivilege(int privilege){
 }
 
 void Connection::Delete(int id){
-    const char* query = "DELETE FROM users WHERE id=?;";
+    const char* query = "DELETE FROM Uzytkownicy WHERE ID=?;";
     sqlite3_stmt* stmt;
 
     if (sqlite3_prepare_v2(dbHandle_, query, -1, &stmt, nullptr) == SQLITE_OK){
@@ -89,7 +90,7 @@ void Connection::Delete(int id){
 }
 
 void Connection::Delete(string username){
-    const char* query = "DELETE FROM users WHERE login='?';";
+    const char* query = "DELETE FROM Uzytkownicy WHERE Login=?;";
     sqlite3_stmt* stmt;
 
     if (sqlite3_prepare_v2(dbHandle_, query, -1, &stmt, nullptr) == SQLITE_OK){
@@ -106,7 +107,7 @@ void Connection::Delete(string username){
 
 queryResponse Connection::Login(string login, string password) {
     queryResponse response;
-    const char* query = "SELECT * FROM users WHERE login=?;";
+    const char* query = "SELECT * FROM Uzytkownicy WHERE Login=?;";
     sqlite3_stmt* stmt;
     string hash = passHashing(password);
     if (sqlite3_prepare_v2(dbHandle_, query, -1, &stmt, nullptr) == SQLITE_OK){

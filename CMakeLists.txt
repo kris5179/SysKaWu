@@ -10,13 +10,16 @@ find_package(Qt6 REQUIRED COMPONENTS Quick)
 
 add_executable(SysKaWu main.cpp
     qml/resources.qrc
-	backend/szyfrowanie.cpp
-	backend/szyfrowanie.h
+    qml/manager.cpp
+    qml/manager.h
+	backend/passwords.cpp
+	backend/passwords.h
     backend/connection.cpp
     backend/connection.h
     backend/serverHeader.h
     backend/serverBodies.cpp
-    backend/queryResponse.h)
+    backend/queryResponse.h
+    )
 
     
 target_link_libraries(SysKaWu sodium)

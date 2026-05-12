@@ -9,8 +9,7 @@ private:
     sqlite3* dbHandle_;
     string filename_;
 public:
-    Connection();
-    Connection(const string& filename);
+    Connection(const string& filename = "Baza_glowna.db");
     virtual ~Connection();
     void Insert(int id, int privilege, const string& username, const string& password);
     void SelectById(int id);
