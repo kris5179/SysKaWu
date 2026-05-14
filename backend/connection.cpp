@@ -3,6 +3,7 @@
 #include <sodium.h>
 #include <sodium/crypto_pwhash.h>
 #include <string>
+#include <vector>
 #include "sqlite3.h"
 #include "passwords.h"
 using namespace std;
@@ -38,6 +39,7 @@ void Connection::Insert(int privilege, const string& username, const string& pas
     } else {
         prepStmtError();
     }
+    sqlite3_finalize(stmt);
 }
 
 void Connection::SelectById(int id){ 
@@ -54,6 +56,7 @@ void Connection::SelectById(int id){
     } else {
         prepStmtError();
     }
+    sqlite3_finalize(stmt);
 }
 
 void Connection::SelectByPrivilege(int privilege){
@@ -70,6 +73,7 @@ void Connection::SelectByPrivilege(int privilege){
     } else {
         prepStmtError();
     }
+    sqlite3_finalize(stmt);
 }
 
 void Connection::Delete(int id){
@@ -86,6 +90,7 @@ void Connection::Delete(int id){
     } else {
         prepStmtError();
     }
+    sqlite3_finalize(stmt);
 }
 
 void Connection::Delete(string username){
@@ -102,6 +107,7 @@ void Connection::Delete(string username){
     } else {
         prepStmtError();
     }
+    sqlite3_finalize(stmt);
 }
 
 queryResponse Connection::Login(string login, string password) {
@@ -124,7 +130,7 @@ queryResponse Connection::Login(string login, string password) {
                 response.id = -1;
                 response.privilege = -1;
                 response.login = "";
-                response.found = false;
+
                 return response;
             }
 
@@ -143,6 +149,7 @@ queryResponse Connection::Login(string login, string password) {
         prepStmtError();
     }
 
+    sqlite3_finalize(stmt);
     return response;
 }
 
@@ -159,4 +166,28 @@ void Connection::queryError(){
 
 void Connection::prepStmtError(){
     cerr << "Błąd podczas przygotowywania zapytania: " << sqlite3_errmsg(dbHandle_) << endl;
+}
+
+vector<animal> Connection::getAnimals(int id){
+    vector<animal> result;
+    const char* query = "SELECT * FROM Zwierzeta WHERE ID = ?";
+    sqlite3_stmt* stmt;
+
+    if (sqlite3_prepare_v2(dbHandle_, query, -1, &stmt, nullptr) != SQLITE_OK) {
+        prepStmtError();
+    } else {
+        sqlite3_bind_int(stmt, 1, id);
+        while(sqlite3_step(stmt) == SQLITE_ROW){
+            animal a;
+            a.id = sqlite3_column_int(stmt, 0);
+            a.species = QString((const char*)sqlite3_column_text(stmt, 1));
+            a.breed = QString((const char*)sqlite3_column_text(stmt, 2));
+            a.name = QString((const char*)sqlite3_column_text(stmt, 3));
+            a.ownerId = sqlite3_column_int(stmt, 4);
+            a.reason = QString((const char*)sqlite3_column_text(stmt, 5));
+            result.push_back(a);
+        }
+    }
+    sqlite3_finalize(stmt);
+    return result;
 }

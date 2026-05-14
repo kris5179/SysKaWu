@@ -1,8 +1,9 @@
+#pragma once
 #include <string>
 #include "sqlite3.h"
 #include "queryResponse.h"
+#include <vector>
 using namespace std;
-
 
 class Connection {
 private:
@@ -19,4 +20,5 @@ public:
     queryResponse Login(string login, string password);
     void queryError();
     void prepStmtError();
+    vector<animal> getAnimals(int id);
 };

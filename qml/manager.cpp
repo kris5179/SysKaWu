@@ -1,4 +1,6 @@
 #include "manager.h"
+#include <qcontainerfwd.h>
+#include "../backend/queryResponse.h"
 using namespace std;
 
 Manager::Manager() {};
@@ -14,12 +16,14 @@ Q_INVOKABLE void Manager::logIntoApp(QString login, QString password){
     // response.found == false jest wtedy, kiedy nie znaleziono użytkownika
     if (response.found == false) {
         loginSuccess = false;
+        user["errMsg"] = QString("Nie ma takiego użytkownika");
         emit loginSignal();
     }
 
     // response.id = -1, kiedy hasło jest złe
-    else if (response.id < 0){
+    else if (response.found == true && response.id < 0){
         loginSuccess = false;
+        user["errMsg"] = QString("Złe hasło");
         emit loginSignal();
     }
     else {
@@ -32,4 +36,20 @@ Q_INVOKABLE void Manager::logIntoApp(QString login, QString password){
         emit loginSignal(); 
     }
 }
+
+QVariantList Manager::getAnimals(int id){
+    QVariantList result;
+    for (const animal& a : con.getAnimals(id)){
+        QVariantMap map;
+        map["id"]           = a.id;
+        map["species"]      = a.species;
+        map["breed"]        = a.breed;
+        map["name"]         = a.name;
+        map["ownerId"]      = a.ownerId;
+        map["reason"]       = a.reason;
+        result.append(map);
+    }
+    return result;
+} 
+
 Manager::~Manager() {};
