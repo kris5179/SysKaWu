@@ -62,9 +62,12 @@ ApplicationWindow{
     Connections {
         target: klinika
         function onLoginSignal(){
-            if (klinika.loginSuccess){
+            if (klinika.loginSuccess && klinika.user.id > 0){
                 komunikat.text = "Witaj, " + klinika.user["login"]
-            } else {
+            } else if (klinika.loginSuccess && klinika.user.id < 0){
+                komunikat.text = klinika.user["errMsg"]
+            }
+            else {
                 komunikat.text = klinika.user["errMsg"] 
             }
         }
