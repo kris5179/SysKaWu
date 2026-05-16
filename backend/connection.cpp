@@ -191,3 +191,78 @@ vector<animal> Connection::getAnimals(int id){
     sqlite3_finalize(stmt);
     return result;
 }
+
+vector<medicine> Connection::getMedicines()
+{
+    vector<medicine> result;
+    const char* query="SELECT * FROM Leki";
+    sqlite3_stmt* stmt;
+
+    if (sqlite3_prepare_v2(dbHandle_, query, -1, &stmt, nullptr) == SQLITE_OK)
+    {
+        while (sqlite3_step(stmt)==SQLITE_ROW)
+        {
+            medicine m;
+            m.id=sqlite3_column_int(stmt,0);
+            m.name=QString((const char*)sqlite3_column_text(stmt,1));
+            m.stock=sqlite3_column_int(stmt,2);
+            m.batchNumber=QString((const char*)sqlite3_column_text(stmt,4));
+            m.unit=QString((const char*)sqlite3_column_text(stmt,5));
+            result.push_back(m);
+        }
+    } else
+    {
+        prepStmtError();
+    }
+    sqlite3_finalize(stmt);
+    return result;
+}
+
+void Connection::deleteMecidine(int id)
+{
+    const char* query="DELETE FROM Leki WHERE ID=?;";
+    sqlite3_stmt* stmt;
+
+    if (sqlite3_prepare_v2(dbHandle_, query, -1, &stmt, nullptr) == SQLITE_OK)
+    {
+        sqlite3_bind_int(stmt, 1, id);
+        if (sqlite3_step(stmt)!= SQLITE_DONE)
+        {
+            queryError();
+        } else
+        {
+            cout << "Pomyślnie usunięto lek o ID: " << id << endl;
+        }
+    } else
+    {
+        prepStmtError();
+    }
+    sqlite3_finalize(stmt);
+}
+
+void Connection::insertMedicine(const string& name, int stock, const string& batchNumber, const string& unit)
+{
+    const char* query= "INSERT INTO Leki (Nazwa, Stan_magazynowy, Termin_waznosci, Numer_partii, jednostka) VALUES (?,?,?,?,?);";
+    sqlite3_stmt* stmt;
+
+    if (sqlite3_prepare_v2(dbHandle_, query, -1, &stmt, nullptr) == SQLITE_OK)
+    {
+        sqlite3_bind_text(stmt, 1, name.c_str(),-1,SQLITE_STATIC);
+        sqlite3_bind_int(stmt, 2, stock);
+        sqlite3_bind_text(stmt, 3, "",-1,SQLITE_STATIC);
+        sqlite3_bind_text(stmt, 4, batchNumber.c_str(),-1,SQLITE_STATIC);
+        sqlite3_bind_text(stmt, 5, unit.c_str(),-1,SQLITE_STATIC);
+
+        if (sqlite3_step(stmt) != SQLITE_DONE)
+        {
+            queryError();
+        } else
+        {
+            cout << "Pomyślnie dodano nowy lek do bazy" << endl;
+        }
+    } else
+    {
+        prepStmtError();
+    }
+    sqlite3_finalize(stmt);
+}

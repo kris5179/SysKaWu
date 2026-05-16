@@ -10,7 +10,7 @@ private:
     sqlite3* dbHandle_;
     string filename_;
 public:
-    Connection(const string& filename = "Baza_glowna.db");
+    Connection(const string& filename = "../backend/Baza_glowna.db");
     virtual ~Connection();
     void Insert(int privilege, const string& username, const string& password);
     void SelectById(int id);
@@ -21,4 +21,8 @@ public:
     void queryError();
     void prepStmtError();
     vector<animal> getAnimals(int id);
+    vector<medicine> getMedicines();
+    void deleteMecidine(int id);
+    void insertMedicine(const string& name, int stock, const string& batchNumber, const string& unit);
+
 };

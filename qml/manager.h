@@ -22,6 +22,9 @@ public:
     Q_INVOKABLE void logIntoApp(QString login, QString password);
     bool getLoginSuccess() { return loginSuccess; }
     Q_INVOKABLE QVariantList getAnimals(int id);
+    Q_INVOKABLE QVariantList getMedicines();
+    Q_INVOKABLE void deleteMedicine(int id);
+    Q_INVOKABLE void addMedicine(QString name, int stock, QString batchNumber, QString unit);
 signals:
     void loginSignal();
 };

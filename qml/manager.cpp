@@ -50,6 +50,28 @@ QVariantList Manager::getAnimals(int id){
         result.append(map);
     }
     return result;
-} 
+}
 
+QVariantList Manager::getMedicines(){
+    QVariantList result;
+    for (const medicine& m : con.getMedicines()){
+        QVariantMap map;
+        map["id"]            = m.id;
+        map["name"]          = m.name;
+        map["stock"]         = m.stock;
+        map["batchNumber"]   = m.batchNumber;
+        map["unit"]          = m.unit;
+        result.append(map);
+    }
+    return result;
+}
+void Manager::deleteMedicine(int id)
+{
+    con.deleteMecidine(id);
+}
+
+void Manager::addMedicine(QString name, int stock,  QString batchNumber, QString unit)
+{
+    con.insertMedicine(name.toStdString(),stock,batchNumber.toStdString(), unit.toStdString());
+}
 Manager::~Manager() {};

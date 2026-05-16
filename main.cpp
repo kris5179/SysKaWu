@@ -21,14 +21,17 @@ int main(int argc, char* argv[]){
         cout << "Biblioteka sodium nie mogła zostać załadowana" << endl;
     }
     
-    string haslo = "haslo";
-    string login = "login";
-    string hash = passHashing(haslo);
+    Connection con;
     Manager manager;
     QGuiApplication app(argc, argv);
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("klinika", &manager);
     engine.load("qrc:/main.qml");
+
+    if (engine.rootObjects().isEmpty()){
+        cerr << "Blad ladowania qml" << endl;
+        return -1;
+    }
     return app.exec();
 
     //Server Server(8080);
