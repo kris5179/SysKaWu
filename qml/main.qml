@@ -1,75 +1,17 @@
 import QtQuick
 import QtQuick.Controls
 
-ApplicationWindow{
+ApplicationWindow {
     visible: true
-    color: "white"
-    width: 500
+    width: 600
     height: 500
     title: "SysKaWu"
+    Component.onCompleted: console.log("ApplicationWindow załadowany")
 
-    Column {
-        anchors.centerIn: parent
-
-        TextField {
-            id: poleLogin
-            placeholderText: "Wpisz login"
-        }
-
-        TextField {
-            id: poleHaslo
-            placeholderText: "Wpisz haslo"
-            echoMode: TextInput.Password
-        }
-
-        Button {
-            text: "Zaloguj"
-            onClicked: klinika.logIntoApp(poleLogin.text, poleHaslo.text)
-        }
-
-        Text {
-            id: komunikat
-            text: ""
-        }
-
-        // ?
-        TextField {
-            id: poleIdZwierzaka
-            placeholderText: "Wpisz id zwierzaka"
-            validator: IntValidator { bottom: 1 }
-        }
-
-        Button {
-            text: "Wyświetl zwierzaka"
-            onClicked: listaZwierzat.model = klinika.getAnimals(parseInt(poleIdZwierzaka.text))
-        }
-
-        ListView {
-            id: listaZwierzat
-            width: parent.width
-            height: 300
-            model: []
-            delegate: Row {
-                spacing: 10
-                Text { text: modelData["name"]}
-                Text { text: modelData["species"]}
-                Text { text: modelData["breed"]}
-            }
-        }
-    }
-
-
-    Connections {
-        target: klinika
-        function onLoginSignal(){
-            if (klinika.loginSuccess && klinika.user.id > 0){
-                komunikat.text = "Witaj, " + klinika.user["login"]
-            } else if (klinika.loginSuccess && klinika.user.id < 0){
-                komunikat.text = klinika.user["errMsg"]
-            }
-            else {
-                komunikat.text = klinika.user["errMsg"] 
-            }
-        }
+    StackView {
+        id: stos
+        anchors.fill: parent
+        initialItem: "loginView.qml"
+        Component.onCompleted: console.log("Stack view załadowany, initial item: ", initialItem)
     }
 }
