@@ -126,11 +126,9 @@ queryResponse Connection::Login(string login, string password) {
                 password.c_str(),
                 password.size()) != 0) 
             {
-                cout << "Hasło się nie zgadza" << endl;
                 response.id = -1;
                 response.privilege = -1;
                 response.login = "";
-
                 return response;
             }
 

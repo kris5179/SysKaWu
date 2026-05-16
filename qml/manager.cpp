@@ -1,6 +1,7 @@
 #include "manager.h"
 #include <qcontainerfwd.h>
 #include "../backend/queryResponse.h"
+#include <iostream>
 using namespace std;
 
 Manager::Manager() {};
@@ -14,22 +15,15 @@ Q_INVOKABLE void Manager::logIntoApp(QString login, QString password){
     response = con.Login(login.toStdString(), password.toStdString());
     
     // response.found == false jest wtedy, kiedy nie znaleziono użytkownika
-    if (response.found == false) {
+    if (response.found == false || response.id < 0) {
+        if (response.found == false) cerr << "Nie znaleziono użytkownika w bazie" << endl;
+        if (response.id < 0)         cerr << "Hasło użytkownika się nie zgadza" << endl;
         loginSuccess = false;
-        user["errMsg"] = QString("Nie ma takiego użytkownika");
+        user["errMsg"] = QString("Błędny login lub hasło");
         emit loginSignal();
-    }
-
-    // response.id = -1, kiedy hasło jest złe
-    else if (response.found == true && response.id < 0){
-        loginSuccess = false;
-        user["errMsg"] = QString("Złe hasło");
-        emit loginSignal();
-    }
-    else {
+    } else {
         loginSuccess = true;
         user["id"] = response.id;
-
         // przejscie ze stringa na QString
         user["login"] = QString::fromStdString(response.login);
         user["privilege"] = response.privilege;
