@@ -18,3 +18,12 @@ struct animal {
     int ownerId;
     QString reason;
 };
+
+struct medicine
+{
+    int id;
+    QString name;
+    int stock;
+    QString batchNumber;
+    QString unit;
+};
